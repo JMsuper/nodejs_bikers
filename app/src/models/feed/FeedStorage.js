@@ -332,7 +332,7 @@ class FeedStorage{
                     }else{
                         resolve(data);
                     }
-                })
+                });
             });
         }
     
@@ -346,9 +346,24 @@ class FeedStorage{
                     }else{
                         resolve(data);
                     }
-                })
+                });
             });
         }
+	//*********************************************** DELETE ******************************************************//
+	static async deleteFeed(feed_id){
+	    // query 실행이 synchronos하게 되어야 한다.
+	    return new Promise((resolve, reject)=>{
+	        const query = `DELETE FROM feed_image WHERE feed_id=?;DELETE FROM feed WHERE id=?`;
+		    console.log(feed_id);
+		db.query(query,[feed_id,feed_id],(err,data)=>{
+		    if(err){
+		        reject(`${err}`);
+		    }else{
+		        resolve(data);
+		    }
+		});
+	    });
+	}
 }
 
 module.exports = FeedStorage;

@@ -55,7 +55,7 @@ const process = {
         const response = await feed.like();
         const url = {
             method: "PUT",
-            path: "/tour/liked",
+            path: "/feed/liked",
             status: response.err ? 409 : 201,
         };
         return res.status(url.status).json(response);
@@ -65,10 +65,21 @@ const process = {
         const response = await feed.unlike();
         const url = {
             method: "PUT",
-            path: "/tour/unliked",
+            path: "/feed/unliked",
             status: response.err ? 409 : 201,
         };
         return res.status(url.status).json(response);
+    },
+    delete: async(req,res)=>{
+	    console.log(req.body);
+        const feed = new Feed(req.body);
+	const response = await feed.deleteFeed();
+	const url = {
+	    method: "DELETE",
+	    path: "/feed/",
+	    status: response.err ? 409 : 201,
+	};
+	return res.status(url.status).json(response);
     }
 }
 

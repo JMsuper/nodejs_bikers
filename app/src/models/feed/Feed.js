@@ -79,6 +79,16 @@ class Feed{
             return {success:false,err};
         }
     }
+
+    async deleteFeed(){
+        try{
+	    const response = await FeedStorage.deleteFeed(this.body.feed_id);
+	    return response;
+	}catch(err){
+		console.log(err);
+	    return {success:false,err};
+	} 
+    }
 }
 
 module.exports = Feed;

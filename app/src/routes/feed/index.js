@@ -16,4 +16,6 @@ router.post("/image",ctrl.process.image);
 router.put("/liked",ctrl.process.like);
 router.put("/unliked",ctrl.process.unlike);
 
+router.delete("/",ctrl.process.delete);
+
 module.exports = router;
