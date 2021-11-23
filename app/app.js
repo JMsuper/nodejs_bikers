@@ -8,8 +8,7 @@ const http = require("http");
 const server = http.createServer(app);
 const io = socketIO(server);
 const util = require("util");
-const ndb = require("./src/config/ndb");
-const chatStorage = require("./src/models/chat/ChatStorage");
+const ChatStorage = require("./src/models/chat/ChatStorage");
 
 // 라우팅
 const feed = require("./src/routes/feed");
@@ -42,28 +41,29 @@ io.on('connection',(socket)=>{
     });
     
     socket.on("leave", function(roomId,fn){
-	if(roomId != null){
-	    socket.leave(roomId);
-	    console.log("socket leave call!");
-	}
+		if(roomId != null){
+			socket.leave(roomId);
+			console.log("socket leave call!");
+		}
     });
 
-    socket.on("joinChange", function(roomFrom,roomTo){
-        socket.leave(roomFrom);
-	socket.join(roomTo);
-    });
+    // socket.on("joinChange", function(roomFrom,roomTo){
+    //     socket.leave(roomFrom);
+	// socket.join(roomTo);
+    // });
 
     socket.on("message",(data, fn)=>{
-	socket.broadcast.to(data.room).emit("message",
-		{msg: data.msg,room:data.room,writerId:data.writerId,memCount:data.memCount},
-		(ack)=>{
-		  if(ack.status == "success"){
-		    
-		  }
-		});
-	fn({status:"success"});
-	chatStorage.postMessage(data.room,data.writerId,data.msg,1);
+		socket.broadcast.to(data.room).emit("message",
+			{msg: data.msg,room:data.room,writerId:data.writerId,memCount:data.memCount});
+		fn({status:"success"});
+		ChatStorage.postMessage(data.room,data.writerId,data.msg,1);
     });
+
+	socket.on("seen",(data,fn)=>{
+		socket.broadcast.to(data.room).emit("seen",{});
+		ChatStorage.msgChangeToSeen(data.room,data.userId);
+	})
+
     socket.on('disconnect',()=>{
         util.log('user disconnected', socket.id);
     });

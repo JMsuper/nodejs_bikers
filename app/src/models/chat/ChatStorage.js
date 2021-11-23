@@ -4,6 +4,8 @@ const db = require("../../config/db");
 
 class ChatStorage{
 
+	//*************************************************  GET  ***************************************************//
+
     static async getChatRoom(userId){
         return new Promise((resolve,reject)=>{
 	    const query = 
@@ -87,32 +89,34 @@ class ChatStorage{
 
     static async checkRoomExist(goodsId,userId){
         return new Promise((resolve, reject)=>{
-	    const query = 
-		`
-		SELECT * FROM chat_room  WHERE goods_id = ? AND buyer_id = ? LIMIT 1;
-		`
-	    db.query(query,[goodsId,userId],(err,data)=>{
-	    	if(err){
-	        	reject({sucess:false,err});
-	    	}else{
-	        	resolve(data);
-	    	}
+			const query = 
+			`
+			SELECT * FROM chat_room  WHERE goods_id = ? AND buyer_id = ? LIMIT 1;
+			`
+			db.query(query,[goodsId,userId],(err,data)=>{
+				if(err){
+					reject({sucess:false,err});
+				}else{
+					resolve(data);
+				}
+			});
 		});
-	});
     }
 
     static async getChatInShop(goodsId,userId){
         const data = await this.checkRoomExist(goodsId,userId);
-	console.log(data);
-	if(data.length !== 0){
-	    console.log(data[0]);
-	    console.log(data[0].room_id);
-	    const chatMessages = await this.getChatMessage(data[0].room_id,userId);
-	    return chatMessages
-	}else{
-	    return [];
-	}
+		console.log(data);
+		if(data.length !== 0){
+			console.log(data[0]);
+			console.log(data[0].room_id);
+			const chatMessages = await this.getChatMessage(data[0].room_id,userId);
+			return chatMessages
+		}else{
+			return [];
+		}
     }
+
+	//*************************************************  POST  ***************************************************//
 
     static async postMessage(roomId,userId,contents,isviewed){
 	console.log(roomId,userId,contents);
@@ -134,22 +138,42 @@ class ChatStorage{
 
     static createChatRoom(goodsId,sellerId,buyerId){
     	console.log(goodsId,sellerId,buyerId);
-	return new Promise((resolve,reject)=>{
-	    const query = 
-		`
-		INSERT INTO chat_room(goods_id,seller_id,buyer_id) values(?,?,?);
-		SELECT room_id FROM chat_room WHERE goods_id = ? AND buyer_id = ?;
-		`;
-	    db.query(query,[goodsId,sellerId,buyerId,goodsId,buyerId],(err,data)=>{
-	        if(err){
-		    console.log(err);
-		    reject({success:false,err});
-		}else{
-		    resolve(data[1]);
-		}
-	    });
-	});
+		return new Promise((resolve,reject)=>{
+			const query = 
+			`
+			INSERT INTO chat_room(goods_id,seller_id,buyer_id) values(?,?,?);
+			SELECT room_id FROM chat_room WHERE goods_id = ? AND buyer_id = ?;
+			`;
+			db.query(query,[goodsId,sellerId,buyerId,goodsId,buyerId],(err,data)=>{
+				if(err){
+				console.log(err);
+				reject({success:false,err});
+			}else{
+				resolve(data[1]);
+			}
+			});
+		});
     }
+
+	//*************************************************  UPDATE  ***************************************************//
+
+	static async msgChangeToSeen(roomId,userId){
+        return new Promise((resolve, reject)=>{
+			const query = 
+			`
+			UPDATE chat_message SET isviewed = 0 where room_id = ? AND writer_id <> ?;
+			`
+			db.query(query,[roomId,userId],(err,data)=>{
+				if(err){
+					reject({sucess:false,err});
+				}else{
+					resolve();
+				}
+			});
+		});
+    }
+
+	//*************************************************  DELETE  ***************************************************//
 }
 
 module.exports = ChatStorage;
