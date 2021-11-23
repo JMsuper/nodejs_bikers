@@ -70,10 +70,10 @@ class ChatStorage{
     }
 
     static async getChatMessage(roomId,userId){
+		await this.msgChangeToSeen(roomId,userId);
         return new Promise((resolve,reject)=>{
 	    const query =
 		`
-		UPDATE chat_message SET isviewed = 0 where room_id = ? AND writer_id <> ?;
 		SELECT * FROM chat_message where room_id = ? order by created_date;
 		`;
 	    db.query(query,[roomId,userId,roomId],(err,data)=>{
@@ -81,7 +81,7 @@ class ChatStorage{
 		    console.log(err);
 		    reject({success:false,err});
 		}else{
-		     resolve(data[1]);
+		     resolve(data[0]);
 		}
 	    });
 	});
