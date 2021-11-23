@@ -32,12 +32,13 @@ app.use("/tour",tour);
 app.use("/chat",chat);
 
 io.on('connection',(socket)=>{
-    util.log('a user conneted');
+    util.log('a user conneted',socket.id);
 
     socket.on("join", function(roomId, fn){
         socket.join(roomId, function(){
 	    util.log("Join", roomId, Object.keys(socket.rooms));
 	});
+	socket.broadcast.to(roomId).emit("seen",{});
     });
     
     socket.on("leave", function(roomId,fn){
@@ -60,9 +61,10 @@ io.on('connection',(socket)=>{
     });
 
 	socket.on("seen",(data,fn)=>{
+		console.log("seen");
 		socket.broadcast.to(data.room).emit("seen",{});
 		ChatStorage.msgChangeToSeen(data.room,data.userId);
-	})
+	});
 
     socket.on('disconnect',()=>{
         util.log('user disconnected', socket.id);
