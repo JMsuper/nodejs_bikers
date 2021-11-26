@@ -19,9 +19,9 @@ class ChatStorage{
 					select * from chat_room 
 					where seller_id= ? or buyer_id=?) as r
 				on m.room_id = r.room_id) as r
-			where (room_id,created_date)
+			where (room_id,message_id)
 			in(
-				select room_id, max(created_date) from chat_message group by room_id
+				select room_id, max(message_id) from chat_message group by room_id
 			) ) as chat
 		join users on chat.seller_id = users.id
 		order by chat.created_date desc;
@@ -81,7 +81,7 @@ class ChatStorage{
 		    console.log(err);
 		    reject({success:false,err});
 		}else{
-		     resolve(data[0]);
+		     resolve(data);
 		}
 	    });
 	});

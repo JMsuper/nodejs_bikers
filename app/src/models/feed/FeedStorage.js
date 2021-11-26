@@ -36,7 +36,7 @@ class FeedStorage{
                (
                select from_user,to_user from friend where from_user = ?
                ) as friend
-               ON feed.writer_id = friend.to_user;
+               ON feed.writer_id = friend.to_user ORDER BY id DESC;
                 `
                 db.query(query,[user_id,parseInt(limit),user_id],(err,data)=>{
                     if(err) {reject(`${err}`);console.log(err);}
@@ -64,7 +64,7 @@ class FeedStorage{
                 (
                 select from_user,to_user from friend where from_user = ?
                 ) as friend
-                ON feed.writer_id = friend.to_user;
+                ON feed.writer_id = friend.to_user ORDER BY id DESC;
                 `
                 db.query(query,[user_id,parseInt(feed_id),parseInt(limit),user_id],(err,data)=>{
                     if(err) {reject(`${err}`);console.log(err);}
